@@ -78,12 +78,12 @@ form button,a button{
 }
 
 #successModal h2 {
-    font-size: 24px;
+    font-size: 1.5rem;
     margin-bottom: 10px;
 }
 
 #successModal p {
-    font-size: 16px;
+    font-size: 1rem;
 }
 
 .remember-me {

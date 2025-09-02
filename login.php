@@ -91,13 +91,17 @@ if ($_SERVER['REQUEST_METHOD']==="POST") {
 <form method="post">
 	<div><input type="email" name="email" placeholder="Enter Email ID" value="<?php echo htmlspecialchars($rememberedEmail); ?>" required></div>
 	<div><input type="password" name="password" placeholder="Enter Password" value="<?php echo htmlspecialchars($rememberedPassword); ?>" required></div>
+    <div style="display:flex; justify-content: space-between; align-items: center;">
 <div class="remember-me">
     <input type="checkbox" name="remember_me" id="remember_me" <?php if ($rememberedEmail) echo 'checked'; ?>>
     <label for="remember_me">Remember Me</label>
 </div>
+<a style="color:#333;" href="forgotpassword.php">Forgot Password ?</a>
+</div>
 	<div><button type="submit">Login</button></div>
 </form>
 <div style="text-align:center;margin: 1rem 0;color: red;"><?php echo $errorMsg; ?></div>
+
 <!-- Success Modal -->
 <div id="successModal" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #4CAF50; color: white; padding: 20px; border-radius: 10px; text-align: center;">
     <h2>Login Successful!</h2>
