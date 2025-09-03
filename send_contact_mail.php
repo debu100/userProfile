@@ -7,13 +7,21 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name    = htmlspecialchars($_POST['name']);
-    $email   = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $subject = htmlspecialchars($_POST['subject']);
-    $message = htmlspecialchars($_POST['message']);
+    $name    = htmlspecialchars($_POST['contact_name']);
+    $email   = filter_var($_POST['contact_email'], FILTER_SANITIZE_EMAIL);
+    $subject = htmlspecialchars($_POST['contact_subject']);
+    $message = htmlspecialchars($_POST['contact_message']);
+
+    // Validate
+    if (empty($name) || empty($email) || empty($subject) || empty($message)) {
+        header("Location: contact.php?error=invalid_request");
+        exit();
+    }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        die("Invalid email format.");
+        // die("Invalid email format.");
+         header("Location: contact.php?error=invalid_email");
+        exit();
     }
 
     $mail = new PHPMailer(true);
@@ -31,6 +39,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Email headers
         $mail->setFrom($email, $name);                    // From sender
         $mail->addAddress($_ENV['EMAIL_USERNAME']);         // To your email
+
+//         $mail->setFrom($_ENV['EMAIL_USERNAME'], 'Website Contact Form');
+// $mail->addReplyTo($email, $name); // So you can reply to user
+
 
         // Email content
         $mail->isHTML(true);
