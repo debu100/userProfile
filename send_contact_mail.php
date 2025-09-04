@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mail = new PHPMailer(true);
 
     try {
-        // SMTP settings
+        // SMTP settings - === 1. Send email to site owner ===
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        // Email headers
+        // Email headers - Sender and recipient
         $mail->setFrom($email, $name);                    // From sender
         $mail->addAddress($_ENV['EMAIL_USERNAME']);         // To your email
 
@@ -52,14 +52,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                           <strong>Subject:</strong> $subject<br>
                           <strong>Message:</strong><br>" . nl2br($message);
 
-        $mail->send();
+        $mail->send(); // Send to site owner
+
+
+        // === 2. Auto-reply to user ===
+        $autoReply = new PHPMailer(true);
+        $autoReply->isSMTP();
+        $autoReply->Host       = 'smtp.gmail.com';
+        $autoReply->SMTPAuth   = true;
+        $autoReply->Username   = $_ENV['EMAIL_USERNAME'];
+        $autoReply->Password   = $_ENV['EMAIL_PASSWORD'];
+        $autoReply->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $autoReply->Port       = 587;
+
+        // From and to
+        $autoReply->setFrom($_ENV['EMAIL_USERNAME'], 'User Profile Application');
+        $autoReply->addAddress($email, $name); // Send back to user
+
+        // Email content
+        $autoReply->isHTML(true);
+        $autoReply->Subject = "Thank you for contacting us!";
+
+        $autoReply->Body = "
+            Hi <strong>$name</strong>,<br><br>
+            Thank you for reaching out. We've received your message and will get back to you as soon as possible.<br><br>
+            <strong>Your message details:</strong><br>
+            <strong>Subject:</strong> $subject<br>
+            <strong>Message:</strong><br>" . nl2br($message) . "<br><br>
+            Best regards,<br>
+            Owner @ User Profile Application
+        ";
+
+        try{
+        $autoReply->send(); // Send auto-reply to user - Try to send auto-reply
+        // Auto-reply sent successfully
+            header("Location: contact.php?success=1");
+            exit();    
+        }catch (Exception $e) {
+            // Auto-reply failed (invalid or fake email)
+            header("Location: contact.php?success=1&warning=auto_reply_failed");
+            exit();
+        }
+
         // echo "Message sent successfully!";
         // Redirect to form with success flag
-        header("Location: contact.php?success=1");
-        exit();
+
+
+        // header("Location: contact.php?success=1");
+        // exit();
     } catch (Exception $e) {
         // echo "Mailer Error: {$mail->ErrorInfo}";
         // Redirect with error flag
+
+         // Mailer to site owner failed
         header("Location: contact.php?error=mailer");
         exit();
     }
