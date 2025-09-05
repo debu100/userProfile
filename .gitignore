@@ -3,3 +3,9 @@
 /node_modules/
 /*.log
 .DS_Store
+# Ignore everything inside uploads/
+uploads/*
+
+# But DO NOT ignore these specific files:
+!uploads/.htaccess
+!uploads/.gitkeep

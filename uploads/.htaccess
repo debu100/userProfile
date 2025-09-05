@@ -1,0 +1,6 @@
+<FilesMatch "\.(php|php5|phtml)$">
+    Deny from all
+</FilesMatch>
+
+# Optional: prevent directory listing
+Options -Indexes
