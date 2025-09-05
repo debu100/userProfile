@@ -15,6 +15,8 @@ if ($_SERVER['REQUEST_METHOD']==="POST") {
 	 // Sanitize inputs
     $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
     $password = trim($_POST['password']);
+
+
         // === BACKEND VALIDATION ===
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errorMsg = "Please enter a valid email address.";
@@ -43,7 +45,16 @@ if ($_SERVER['REQUEST_METHOD']==="POST") {
 		$row = mysqli_fetch_assoc($result);
 		// Verify hashed password
         if (password_verify($password, $row['user_passowrd'])) { // Note: check column name
-            $_SESSION['logged'] = $row;
+            
+            // $_SESSION['logged'] = $row;
+
+            // ✅ EXPLICITLY set session fields
+                $_SESSION['logged'] = [
+                    'user_id' => $row['id'],
+                    'user_name' => $row['user_name'],
+                    'user_email' => $row['user_email'],
+                    'profile_image' => $row['profile_image'] ?? null
+                ];
             $success = true;
                             // Handle Remember Me
                 if (isset($_POST['remember_me'])) {
