@@ -57,8 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $file_name = $_FILES['editprofileimage']['name'];
         $file_tmp = $_FILES['editprofileimage']['tmp_name'];
         $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-
+// Limit file size
 if (in_array($file_ext, $allowed_ext)) {
+    if ($_FILES['editprofileimage']['size'] > 256000) {
+        $errors[] = "Image size must not exceed 250KB.";
+    } else{
     // ✅ Check MIME type
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mime = finfo_file($finfo, $file_tmp);
@@ -68,16 +71,30 @@ if (in_array($file_ext, $allowed_ext)) {
     if (!in_array($mime, $allowed_mimes)) {
         $errors[] = "Invalid image MIME type.";
     } else {
-        $new_file_name = uniqid("profile_", true) . "." . $file_ext;
+        // $new_file_name = uniqid("profile_", true) . "." . $file_ext;
+        // $upload_path = "uploads/" . $new_file_name;
+        // Clean username and generate filename
+        $username_cleaned = preg_replace("/[^a-zA-Z0-9_-]/", "", strtolower($new_name));
+
+        // Optional: add user ID or timestamp to avoid conflicts
+        // $new_file_name = $username_cleaned . "_" . $user_id . "." . $file_ext;
+        $new_file_name = $username_cleaned . "_" . $user_id . "_" . time() . "." . $file_ext;
+
+
         $upload_path = "uploads/" . $new_file_name;
 
         if (move_uploaded_file($file_tmp, $upload_path)) {
+            // Delete old profile image if it's different from new one
+            if ($current_image && file_exists($current_image) && $current_image !== $upload_path) {
+                unlink($current_image);
+            }
             $image_path = $upload_path;
         } else {
             $errors[] = "Failed to upload profile image.";
         }
     }
-}   else {
+  } 
+}  else {
             $errors[] = "Invalid image format. Allowed types: jpg, jpeg, png, gif.";
         }
 
